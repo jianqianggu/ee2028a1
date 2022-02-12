@@ -23,15 +23,17 @@
 #include "time.h"
 #include "stdlib.h"
 
- /*
- * CONSTANTS
- * ------------------
- * #define Srow 20
- * #define column 2
- * #define Scen 2
- * #define Mcen 3
- * #define Hcen 4
- */
+ 
+  //CONSTANTS
+  //------------------
+  #define Srow 20
+  #define column 2
+  #define Scen 2
+  #define Mcen 3
+  #define Hcen 4
+  #define N 2  // No. of centroids
+  
+
  
  
 /*
@@ -96,7 +98,7 @@ int main(void)
 	    for(int c=0; c<column; c++)
 	    {
 	        points [r][c] = ( (double)rand() * ( 4.0 - 0.0 ) ) / (double)RAND_MAX + 0.0;
-			points10 [r][c] = Spoints [r][c] * 10;
+			points10 [r][c] = points [r][c] * 10;
 	    }
     }	
 	printf("\n");
@@ -144,7 +146,7 @@ int main(void)
 	//}
 	
 	// Find the optimal number of cluster and display 
-	optimalCluster((int*)elbow_wcss);
+	optimalCluster((int*)elbow_wcss,N);
 	
 	// Infinite loop
 	while(1){}
