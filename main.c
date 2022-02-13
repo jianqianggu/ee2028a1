@@ -137,6 +137,7 @@ int main(void)
 			temp3 = new_centroids10[i][1] / 10;
 			temp4 = new_centroids10[i][1] % 10;
 			printf("(%d.%d, %d.%d)\n",temp1, temp2, temp3, temp4);
+			
 
 		}
 		printf("\n");

@@ -29,7 +29,7 @@ optimalCluster:
 ;adress of input array @ R0
 ;adress of number of cluster @ R1
 ;find gradient of array from [R1:R10]
-    LDR R12,#0 ;loop counter
+    LDR R12,#2 ;loop counter (offfset of 2 because we run N-1 times)
     LDR R10,[GRAD] ;original value of GRAD to reset the loop later
 L1:
     LDR R2,[R0] ;load current value
@@ -40,7 +40,7 @@ L1:
     CMP R12,R1 ;compare loop counter with number of cluster
     BNE L1 ;if not equal, jump to L1
 ;find change in gradient from [R1:R10]
-    LDR R12,#0 ; loop counter
+    LDR R12,#2 ; loop counter
     STR R10,[GRAD] ;reset the GRAD iterator
     LDR R10,[DGRA] ;original value of DGRA to reset the loop later
     LDR R11,#0 ;keep track of total sum of DGRA to find average
@@ -59,7 +59,7 @@ L2:
 ;get last n value that passes the average
 ;loop through DGRA to find values that are greater than 75th percentile
 ;store the index to R0 and return
-    LDR R12,#0 ;loop counter
+    LDR R12,#2 ;loop counter
 L3:
     LDR R2,[DGRA] ;load current value
     CMP R2,R11 ;compare current value to average
@@ -75,7 +75,5 @@ L4:
 
 .lcomm  GRAD 100 ; Gradient list
 .lcomm  DGRA 100 ; Delta of gradient
-.lcomm  PERG 100 ; Percentage of gradient
-.lcomm  LOCE 100 ; location of elbow
 
 
