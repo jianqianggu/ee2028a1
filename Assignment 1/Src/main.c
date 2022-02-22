@@ -21,7 +21,7 @@
 #include "stdio.h"
 
 #define M 8	 // No. of data points in total
-#define N 2  // No. of centroids
+#define N 3  // No. of centroids
 
 // Necessary function to enable printf() using semihosting
 extern void initialise_monitor_handles(void);
@@ -44,8 +44,9 @@ int main(void)
 							{4.0, 0.0},
 							{4.0, 1.0} };
 
-	double centroids[N][2] ={ {0.0, 0.5},
-							  {3.0, 0.5} };
+	double centroids[N][3] ={ {0.0, 0.5},
+							  {3.0, 0.5},
+							  {1.5, 0.5} };
 
 	int i,j;
 	int temp1, temp2, temp3, temp4;
