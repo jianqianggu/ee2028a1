@@ -1,5 +1,0 @@
-"./Src/classification.o"
-"./Src/find_new_centroids.o"
-"./Src/main.o"
-"./Src/sysmem.o"
-"./Startup/startup_stm32l475vgtx.o"
