@@ -5,11 +5,11 @@
  *      Author: Gu Jing
  */
    .syntax unified
-	.cpu cortex-m4
-	.fpu softvfp
-	.thumb
+  .cpu cortex-m4
+  .fpu softvfp
+  .thumb
 
-		.global classification
+    .global classification
 
 @ Start of executable code
 .section .text
@@ -21,77 +21,146 @@
 @ Write Student 2’s Name here:
 
 @ You could create a look-up table of registers here:
-@R0 = points[M][2] where M is the number of pts
-@R1 = centroids[N][2] where N is the number of centroids
-@R2 = class[M] where M is the classification [1,N)
-@R3 = new_centroids?, likely unused , will save for find_new_centroids
+
 
 @ write your program from here:
+
+
 classification:
-	PUSH {R0-R12,R14}
-	@store the centroids
-
-	LDR R3,[R0] @R3 = X value of first centroid
-	LDR R4,[R0,#4] @R4 = Y value of first centroid
-	LDR R5,[R0,#4]@R5 = X value of second centroid
-	LDR R6,[R0,#4]@R6 = Y value of second centroid
-	LDR R7,[R0,#4]@R7 = X value of third centroid
-	LDR R8,[R0,#4]@R8 = Y value of third centroid
-	@find distance
-
-	MOV R1,#0 @loop counter, since centroids already loaded, can discard
-L1:
-	@distance of first pt
-	LDR R9,[R1] @R9 = x value of pt
-	LDR R10,[R1],#4 @R10= y value of pt
-	SUB R9,R3@R9 = x value of pt - x value of centroid
-	SUB R10,R4@R10 = y value of pt - y value of centroid
-	MUL R9,R9,R9@R9 = value squared
-	MUL R10,R10,R10@R10 = value squared
-	ADD R9,R10@R9 = sum of squares
-	@distance to 2nd pt
-	LDR R10,[R1] @R10 = x value of pt
-	LDR R11,[R1],#4@R11= y value of pt
-	SUB R10,R3@R10 = x value of pt - x value of centroid
-	SUB R11,R4@R11 = y value of pt - y value of centroid
-	MUL R10,R10,R10@R10 = value squared
-	MUL R11,R11,R11@R11 = value squared
-	ADD R10,R11@R10 = sum of squares
-	@distance to 3rd pt
-	LDR R11,[R1] @R10 = x value of pt
-	LDR R12,[R1],#4@R11= y value of pt
-	SUB R11,R3@R10 = x value of pt - x value of centroid
-	SUB R12,R4@R11 = y value of pt - y value of centroid
-	MUL R12,R12,R12@R10 = value squared
-	MUL R11,R11,R11@R11 = value squared
-	ADD R11,R12@R10 = sum of squares
-	@find smallest distance
-	CMP R9,R10@find smaller distance
-	BLT L2
-	BGT L3
-	STR R2,[R12],#4@ store the classification in OUT
-	@loop logic
-	ADD R1,#1@increment loop counter
-	#CMP R1,M@check if loop counter is larger then M
-	BLS L1
-	POP {R0-R12,R14}
-	BAL END @terminate
-
-L2:
-	CMP R9,R11@find smaller distance
-	ITE GT@if R9 is larger than R11
-	MOVGT R12,#2@ R12(Classification) = 2
-	MOVLE R12,#0@ R12(Classification) = 0
-	BX LR
-L3:
-	CMP R10,R11@find smaller distance
-	ITE GT@if R10 is larger than R11
-	MOVGT R12,#2@ R12(Classification) = 2
-	MOVLE R12,#1@ R12(Classification) = 0
-	BX LR
-
-END:
+  PUSH {R0-R12,R14}
+  LDR R5,[R3,#4]
+  LDR R4,[R3]
+  CMP R5,#2
+  IT EQ
+  BLEQ SUBROUTINE
+  CMP R5,#3
+  IT EQ
+  BLEQ SUBROUTINE1
+  CMP R5,#4
+  IT EQ
+  BLEQ SUBROUTINE2
+  POP {R0-R12,R14}
+  BX LR
 
 
-DATA:
-	.lcomm OUT 100
+
+SUBROUTINE:
+  LDR R5,[R0],#4 @LOAD THE X-COORDINATE OF POINT TESTED
+  LDR R7,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID1
+  SUBS R9,R5,R7 @DIFFERENCE IN X-COORDINATE
+  LDR R6,[R0],#4 @LOAD THE Y-COORDINATE OF POINT TESTED
+  LDR R8,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID1
+  SUBS R10,R6,R8 @DIFFERENCE IN Y-COORDINATE
+  LDR R7,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID2
+  LDR R8,[R1],#-12 @LOAD THE Y-COORDINATE OF CENTROID2
+  SUBS R11,R5,R7 @DIFFERENCE IN X-COORDINATE
+  SUBS R12,R5,R8 @DIFFERENCE IN Y-COORDINATE
+  MUL R9,R9
+  MLA R9,R10,R10,R9
+  MUL R11,R11
+  MLA R11,R12,R12,R11
+  CMP R9,R11
+  ITE GT
+  MOVGT R9,#2
+  MOVLE R9,#1
+  STR R9,[R2],#4
+  SUBS R4,#1
+  CMP R4,#0
+  BNE SUBROUTINE
+  BX LR
+SUBROUTINE1:
+  LDR R5,[R0],#4  @LOAD THE X-COORDINATE OF POINT TESTED
+  LDR R6,[R0],#4 @LOAD THE Y-COORDINATE OF POINT TESTED
+  LDR R7,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID1
+  LDR R8,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID1
+  LDR R9,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID2
+  LDR R10,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID2
+  LDR R11,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID3
+  LDR R12,[R1],#-20 @LOAD THE Y-COORDINATE OF CENTROID3
+  SUBS R7,R5,R7 @DIFFERENCE IN X-COORDINATE FROM CENTROID1
+  SUBS R8,R6,R8 @DIFFERENCE IN Y-COORDINATE FROM CENTROID1
+  SUBS R9,R5,R9 @DIFFERENCE IN X-COORDINATE FROM CENTROID2
+  SUBS R10,R6,R10 @DIFFERENCE IN Y-COORDINATE FROM CENTROID2
+  SUBS R11,R5,R11 @DIFFERENCE IN X-COORDINATE FROM CENTROID3
+  SUBS R12,R6,R12 @DIFFERENCE IN Y-COORDINATE FROM CENTROID3
+  MUL R7,R7
+  MLA R7,R8,R8,R7
+  MUL R9,R9
+  MLA R9,R10,R10,R9
+  MUL R11,R11
+  MLA R11,R12,R12,R11
+  MOV R5,R7
+  CMP R5,R9
+  IT GT
+  MOVGT R5,R9
+  CMP R5,R11
+  IT GT
+  MOVGT R5,R11
+  CMP R5,R7
+  IT EQ
+  MOVEQ R8,#1
+  CMP R5,R9
+  IT EQ
+  MOVEQ R8,#2
+  CMP R5,R11
+  IT EQ
+  MOVEQ R8,#3
+  STR R8,[R2],#4
+  SUBS R4,#1
+  CMP R4,#0
+  BNE SUBROUTINE1
+  BX LR
+SUBROUTINE2:
+  LDR R5,[R0],#4  @LOAD THE X-COORDINATE OF POINT TESTED
+  LDR R6,[R0],#4 @LOAD THE Y-COORDINATE OF POINT TESTED
+  LDR R7,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID1
+  LDR R8,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID1
+  LDR R9,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID2
+  LDR R10,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID2
+  LDR R11,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID3
+  LDR R12,[R1],#4 @LOAD THE Y-COORDINATE OF CENTROID3
+  SUBS R7,R5,R7 @DIFFERENCE IN X-COORDINATE FROM CENTROID1
+  SUBS R8,R6,R8 @DIFFERENCE IN Y-COORDINATE FROM CENTROID1
+  SUBS R9,R5,R9 @DIFFERENCE IN X-COORDINATE FROM CENTROID2
+  SUBS R10,R6,R10 @DIFFERENCE IN Y-COORDINATE FROM CENTROID2
+  SUBS R11,R5,R11 @DIFFERENCE IN X-COORDINATE FROM CENTROID3
+  SUBS R12,R6,R12 @DIFFERENCE IN Y-COORDINATE FROM CENTROID3
+  MUL R7,R7
+  MLA R7,R8,R8,R7
+  MUL R9,R9
+  MLA R9,R10,R10,R9
+  MUL R11,R11
+  MLA R11,R12,R12,R11
+  MOV R5,R7
+  LDR R10,[R1],#4 @LOAD THE X-COORDINATE OF CENTROID4
+  LDR R12,[R1],#-28 @LOAD THE Y-COORDINATE OF CENTROID4
+  MUL R10,R10
+  MLA R10,R12,R12,R10
+  CMP R5,R9
+  IT GT
+  MOVGT R5,R9
+  CMP R5,R11
+  IT GT
+  MOVGT R5,R11
+  CMP R5,R10
+  IT GT
+  MOVGT R5,R10
+  CMP R5,R7
+  IT EQ
+  MOVEQ R8,#1
+  CMP R5,R9
+  IT EQ
+  MOVEQ R8,#2
+  CMP R5,R11
+  IT EQ
+  MOVEQ R8,#3
+  CMP R5,R10
+  IT EQ
+  MOVEQ R8,#4
+  STR R8,[R2],#4
+  SUBS R4,#1
+  CMP R4,#0
+  BNE SUBROUTINE2
+  BX LR
+
+@credit Xinwen
