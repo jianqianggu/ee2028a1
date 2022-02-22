@@ -1,6 +1,7 @@
 #ignore everything
 EE2028_AY2122S1_Assign1/*
-!EE2028_AY2122S1_Assign1/SrC
+!EE2028_AY2122S1_Assign1/Src
+.metadata/*
 # Prerequisites
 *.d
 
